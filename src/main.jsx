@@ -663,13 +663,14 @@ function App() {
                 <textarea placeholder="ضع الكود أو رسالة الخطأ هنا..." />
 
                 <button
-                  className="primary-button"
-                  onClick={() =>
-                    alert("سيتم ربط أداة اكتشاف الأخطاء بمحرك الذكاء الاصطناعي.")
-                  }
-                >
-                  <Bug size={17} /> تحليل
-                              </section>
+  className="primary-button"
+  onClick={() =>
+    alert("سيتم ربط أداة اكتشاف الأخطاء بمحرك الذكاء الاصطناعي.")
+  }
+>
+  <Bug size={17} /> تحليل
+</button>
+</section>
           )}
 
           {page === "projects" && (
