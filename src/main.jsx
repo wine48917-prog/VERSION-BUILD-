@@ -1,34 +1,11 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Code2,
-  Sparkles,
-  FolderKanban,
-  Bug,
-  BookOpen,
-  Settings,
-  MessageCircle,
-  Plus,
-  Search,
-  Bell,
-  Menu,
-  X,
-  Send,
-  ChevronLeft,
-  LayoutDashboard,
-  WandSparkles,
-  Terminal,
-  User,
-  LogOut,
-  Eye,
-  Moon,
-  Sun,
-  ArrowUp,
-  FileCode2,
-  Cpu,
-  ShieldCheck,
-  Zap,
-  Globe,
+  Code2, Sparkles, FolderKanban, Bug, BookOpen, Settings,
+  MessageCircle, Plus, Bell, Menu, X, ChevronLeft,
+  LayoutDashboard, WandSparkles, Terminal, User, LogOut,
+  Moon, Sun, ArrowUp, FileCode2, Cpu, ShieldCheck, Zap,
+  Send, Trash2, Search
 } from "lucide-react";
 
 import "./style.css";
@@ -39,15 +16,21 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [showAuth, setShowAuth] = useState(true);
   const [authMode, setAuthMode] = useState("login");
+
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [chatOpen, setChatOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+
   const [prompt, setPrompt] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projects, setProjects] = useState([]);
+
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState("");
 
   const navigation = [
     { id: "dashboard", label: "الرئيسية", icon: LayoutDashboard },
@@ -84,7 +67,7 @@ function App() {
       id: "debugger",
       icon: Bug,
       title: "AI Debugger",
-      description: "حلّل الأخطاء البرمجية وساعد في إصلاحها.",
+      description: "حلّل الأخطاء البرمجية واكتشف أسبابها.",
       color: "orange",
     },
   ];
@@ -92,8 +75,18 @@ function App() {
   function handleLogin(e) {
     e.preventDefault();
 
-    if (!email.trim() || !password.trim()) {
-      alert("من فضلك أدخل البريد الإلكتروني وكلمة المرور.");
+    if (!email.trim()) {
+      alert("أدخل البريد الإلكتروني.");
+      return;
+    }
+
+    if (authMode === "forgot") {
+      alert("استعادة كلمة المرور تحتاج ربط خدمة البريد الإلكتروني.");
+      return;
+    }
+
+    if (!password.trim()) {
+      alert("أدخل كلمة المرور.");
       return;
     }
 
@@ -102,17 +95,23 @@ function App() {
   }
 
   function handleCreateProject() {
-    if (!projectName.trim()) return;
+    if (!projectName.trim()) {
+      alert("اكتب اسم المشروع أولاً.");
+      return;
+    }
 
     const newProject = {
       id: Date.now(),
-      name: projectName,
+      name: projectName.trim(),
       date: new Date().toLocaleDateString("ar-EG"),
     };
 
     setProjects((old) => [newProject, ...old]);
     setProjectName("");
-    setPage("projects");
+  }
+
+  function deleteProject(id) {
+    setProjects((old) => old.filter((project) => project.id !== id));
   }
 
   function handleSendMessage(e) {
@@ -124,7 +123,7 @@ function App() {
       ...old,
       {
         id: Date.now(),
-        text: message,
+        text: message.trim(),
         sender: "user",
       },
     ]);
@@ -135,7 +134,10 @@ function App() {
   function handleBuilder(e) {
     e.preventDefault();
 
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) {
+      alert("اكتب وصف المشروع أولاً.");
+      return;
+    }
 
     setPage("builder");
   }
@@ -145,6 +147,18 @@ function App() {
     setUser("");
     setEmail("");
     setPassword("");
+    setAuthMode("login");
+  }
+
+  function analyzeCode() {
+    if (!code.trim()) {
+      alert("الصق الكود أو رسالة الخطأ أولاً.");
+      return;
+    }
+
+    setResult(
+      "تم استلام الكود. واجهة التحليل جاهزة، لكن يلزم ربط محرك ذكاء اصطناعي للحصول على تحليل حقيقي."
+    );
   }
 
   const Icon = ({ icon: Component, size = 20 }) => (
@@ -154,8 +168,8 @@ function App() {
   if (showAuth) {
     return (
       <main className={`auth-screen ${darkMode ? "dark" : "light"}`}>
-        <div className="auth-decoration decoration-one"></div>
-        <div className="auth-decoration decoration-two"></div>
+        <div className="auth-decoration decoration-one" />
+        <div className="auth-decoration decoration-two" />
 
         <section className="auth-card">
           <div className="brand auth-brand">
@@ -180,18 +194,16 @@ function App() {
                 : "استعادة كلمة المرور"}
             </h2>
 
-            <p>ابدأ رحلتك في عالم تطوير البرمجيات بالذكاء الاصطناعي.</p>
+            <p>
+              ابدأ رحلتك في عالم تطوير البرمجيات بالذكاء الاصطناعي.
+            </p>
           </div>
 
           <form className="auth-form" onSubmit={handleLogin}>
             {authMode === "register" && (
               <label>
                 اسم المستخدم
-                <input
-                  type="text"
-                  placeholder="اسمك"
-                  required
-                />
+                <input type="text" placeholder="اسمك" required />
               </label>
             )}
 
@@ -321,7 +333,7 @@ function App() {
             >
               <Icon icon={item.icon} />
               <span>{item.label}</span>
-              {page === item.id && <span className="active-dot"></span>}
+              {page === item.id && <span className="active-dot" />}
             </button>
           ))}
         </nav>
@@ -330,17 +342,14 @@ function App() {
           <div className="nav-title">الإعدادات</div>
 
           <button
-            className="nav-item"
+            className={`nav-item ${page === "settings" ? "active" : ""}`}
             onClick={() => setPage("settings")}
           >
             <Settings size={19} />
             <span>الإعدادات</span>
           </button>
 
-          <button
-            className="nav-item"
-            onClick={() => setChatOpen(true)}
-          >
+          <button className="nav-item" onClick={() => setChatOpen(true)}>
             <MessageCircle size={19} />
             <span>الدعم الفني</span>
           </button>
@@ -385,7 +394,7 @@ function App() {
           <div className="topbar-actions">
             <button
               className="icon-button"
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => setDarkMode((old) => !old)}
               title="تغيير المظهر"
             >
               {darkMode ? <Sun size={19} /> : <Moon size={19} />}
@@ -422,7 +431,7 @@ function App() {
 
                 <div className="welcome-decoration">
                   <Code2 size={78} strokeWidth={1} />
-                  <div className="decoration-glow"></div>
+                  <div className="decoration-glow" />
                 </div>
               </section>
 
@@ -583,7 +592,7 @@ function App() {
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="اشرح فكرتك بالتفصيل... ما نوع الموقع أو التطبيق؟ وما المميزات التي تحتاجها؟"
+                  placeholder="اشرح فكرتك بالتفصيل..."
                 />
 
                 <div className="tool-panel-footer">
@@ -591,7 +600,7 @@ function App() {
                   <button
                     className="primary-button"
                     onClick={() =>
-                      alert("واجهة AI Builder جاهزة، وسيتم ربط محرك الذكاء الاصطناعي في المرحلة القادمة.")
+                      alert("يلزم ربط محرك الذكاء الاصطناعي لتوليد المشروع.")
                     }
                   >
                     <Sparkles size={17} /> إنشاء المشروع
@@ -612,10 +621,20 @@ function App() {
                 <p>بيئة مخصصة لكتابة وتعديل الأكواد البرمجية.</p>
               </div>
 
-              <div className="coming-soon">
-                <Terminal size={42} />
-                <h2>محرر الأكواد قيد التجهيز</h2>
-                <p>نعمل على تجهيز بيئة تحرير أكواد متكاملة.</p>
+              <div className="tool-panel">
+                <label>محرر الأكواد</label>
+                <textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="اكتب الكود البرمجي هنا..."
+                />
+                <button
+                  className="primary-button"
+                  onClick={() => setResult("تم حفظ النص داخل الواجهة الحالية فقط.")}
+                >
+                  <Code2 size={17} /> حفظ التعديلات
+                </button>
+                {result && <p className="result-message">{result}</p>}
               </div>
             </section>
           )}
@@ -633,243 +652,209 @@ function App() {
 
               <div className="tool-panel">
                 <label>ضع الكود الذي تريد شرحه</label>
-                <textarea placeholder="الصق الكود البرمجي هنا..." />
+                <textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="الصق الكود البرمجي هنا..."
+                />
 
                 <button
                   className="primary-button"
-                  onClick={() =>
-                    alert("سيتم ربط أداة شرح الأكواد بمحرك الذكاء الاصطناعي.")
-                  }
-                >
-                  <Sparkles size={17} /> شرح الكود
-                </button>
-              </div>
-            </section>
-          )}
+                  onClick={() => {
+                    if (!code.trim()) {
+  alert("الصق الكود أولاً.");
+  return;
+}
 
-          {page === "debugger" && (
-            <section className="tool-page">
-              <div className="tool-heading">
-                <div className="large-tool-icon orange">
-                  <Bug size={30} />
-                </div>
-                <span className="eyebrow">ERROR ANALYSIS</span>
-                <h1>AI Debugger</h1>
-                <p>حلّل الأخطاء البرمجية واكتشف أسبابها.</p>
-              </div>
-
-              <div className="tool-panel">
-                <label>الصق الكود أو رسالة الخطأ</label>
-                <textarea placeholder="ضع الكود أو رسالة الخطأ هنا..." />
-
-                <button
-  className="primary-button"
-  onClick={() =>
-    alert("سيتم ربط أداة اكتشاف الأخطاء بمحرك الذكاء الاصطناعي.")
-  }
+setResult("يلزم ربط محرك الذكاء الاصطناعي لشرح الكود.");
+}}
 >
-  <Bug size={17} /> تحليل
+  <Sparkles size={17} /> شرح الكود
 </button>
+
+{result && <p className="result-message">{result}</p>}
+</div>
 </section>
-          )}
+)}
+          {page === "debugger" && (
+  <section className="tool-page">
+    <div className="tool-heading">
+      <div className="large-tool-icon orange">
+        <Bug size={30} />
+      </div>
+      <span className="eyebrow">ERROR ANALYSIS</span>
+      <h1>AI Debugger</h1>
+      <p>حلّل الأخطاء البرمجية واكتشف أسبابها.</p>
+    </div>
 
-          {page === "projects" && (
-            <section className="tool-page">
-              <div className="section-heading">
-                <div>
-                  <span className="eyebrow">YOUR WORKSPACE</span>
-                  <h1>مشاريعي</h1>
-                  <p>إدارة وتنظيم مشاريعك البرمجية.</p>
-                </div>
-              </div>
+    <div className="tool-panel">
+      <label>الصق الكود أو رسالة الخطأ</label>
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="ضع الكود أو رسالة الخطأ هنا..."
+      />
 
-              <div className="create-project-panel">
-                <div className="create-project-icon">
-                  <Plus size={24} />
-                </div>
+      <button className="primary-button" onClick={analyzeCode}>
+        <Bug size={17} /> تحليل
+      </button>
 
-                <div>
-                  <h3>إنشاء مشروع جديد</h3>
-                  <p>ابدأ مشروعًا جديدًا داخل مساحة العمل.</p>
-                </div>
+      {result && <p className="result-message">{result}</p>}
+    </div>
+  </section>
+)}
 
-                <div className="create-project-input">
-                  <input
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    placeholder="اسم المشروع..."
-                  />
+{page === "projects" && (
+  <section className="tool-page">
+    <div className="section-heading">
+      <div>
+        <h1>مشاريعي</h1>
+        <p>أنشئ مشاريعك وتابعها من مكان واحد.</p>
+      </div>
+    </div>
 
-                  <button
-                    className="primary-button"
-                    onClick={handleCreateProject}
-                  >
-                    <Plus size={17} /> إنشاء
-                  </button>
-                </div>
-              </div>
-
-              <div className="projects-list">
-                {projects.length === 0 ? (
-                  <div className="empty-state">
-                    <FolderKanban size={35} />
-                    <strong>مساحة العمل فارغة</strong>
-                    <span>أنشئ مشروعك الأول للبدء.</span>
-                  </div>
-                ) : (
-                  projects.map((project) => (
-                    <div className="project-row" key={project.id}>
-                      <div className="project-row-icon">
-                        <FileCode2 size={22} />
-                      </div>
-
-                      <div>
-                        <strong>{project.name}</strong>
-                        <span>تاريخ الإنشاء: {project.date}</span>
-                      </div>
-
-                      <button className="icon-button">
-                        <Eye size={18} />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-          )}
-
-          {page === "settings" && (
-            <section className="tool-page">
-              <div className="tool-heading">
-                <div className="large-tool-icon purple">
-                  <Settings size={30} />
-                </div>
-                <h1>الإعدادات</h1>
-                <p>إدارة تفضيلات حسابك ومساحة العمل.</p>
-              </div>
-
-              <div className="settings-panel">
-                <div className="setting-row">
-                  <div>
-                    <strong>المظهر</strong>
-                    <span>تغيير المظهر بين الوضع الداكن والفاتح.</span>
-                  </div>
-
-                  <button
-                    className="secondary-button"
-                    onClick={() => setDarkMode(!darkMode)}
-                  >
-                    {darkMode ? <Sun size={17} /> : <Moon size={17} />}
-                    {darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
-                  </button>
-                </div>
-
-                <div className="setting-row">
-                  <div>
-                    <strong>الدعم الفني</strong>
-                    <span>تواصل مع فريق الدعم.</span>
-                  </div>
-
-                  <button
-                    className="secondary-button"
-                    onClick={() => setChatOpen(true)}
-                  >
-                    <MessageCircle size={17} /> فتح المحادثة
-                  </button>
-                </div>
-              </div>
-            </section>
-          )}
-        </div>
-
-        <footer className="app-footer">
-          <div className="footer-brand">
-            <Code2 size={17} />
-            <strong>VERSION BUILD</strong>
-          </div>
-
-          <span>CODE. CREATE. EVOLVE.</span>
-          <span>© 2026 VERSION BUILD</span>
-        </footer>
-      </main>
-
-      {chatOpen && (
-        <div className="support-window">
-          <div className="support-header">
-            <div className="support-avatar">
-              <MessageCircle size={20} />
-            </div>
-
-            <div>
-              <strong>الدعم الفني</strong>
-              <span>
-                <span className="online-dot"></span> متاح للمساعدة
-              </span>
-            </div>
-
-            <button
-              className="icon-button"
-              onClick={() => setChatOpen(false)}
-            >
-              <X size={19} />
-            </button>
-          </div>
-
-          <div className="support-messages">
-            <div className="support-welcome">
-              <Sparkles size={24} />
-              <strong>أهلاً بك في VERSION BUILD</strong>
-              <p>اكتب رسالتك وسنساعدك في أقرب وقت.</p>
-            </div>
-
-            {messages.map((item) => (
-              <div className="chat-message user-message" key={item.id}>
-                {item.text}
-              </div>
-            ))}
-          </div>
-
-          <form className="support-input" onSubmit={handleSendMessage}>
-            <input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="اكتب رسالتك..."
-            />
-
-            <button type="submit">
-              <Send size={18} />
-            </button>
-          </form>
-        </div>
-      )}
-
-      <div className="mobile-bottom-bar">
-        <button onClick={() => setPage("dashboard")}>
-          <LayoutDashboard size={19} />
-          <span>الرئيسية</span>
-        </button>
-
-        <button onClick={() => setPage("builder")}>
-          <WandSparkles size={19} />
-          <span>Builder</span>
-        </button>
-
-        <button onClick={() => setPage("projects")}>
-          <FolderKanban size={19} />
-          <span>مشاريعي</span>
-        </button>
-
-        <button onClick={() => setChatOpen(true)}>
-          <MessageCircle size={19} />
-          <span>الدعم</span>
+    <div className="tool-panel">
+      <label>اسم المشروع الجديد</label>
+      <div className="create-project-row">
+        <input
+          value={projectName}
+          onChange={(e) => setProjectName(e.target.value)}
+          placeholder="اكتب اسم المشروع..."
+        />
+        <button className="primary-button" onClick={handleCreateProject}>
+          <Plus size={17} /> إنشاء
         </button>
       </div>
     </div>
-  );
+
+    {projects.length === 0 ? (
+      <div className="empty-state">
+        <FolderKanban size={35} />
+        <strong>لا توجد مشاريع حتى الآن</strong>
+        <span>ابدأ بإنشاء مشروعك الأول.</span>
+      </div>
+    ) : (
+      <div className="projects-grid">
+        {projects.map((project) => (
+          <div className="project-card" key={project.id}>
+            <FileCode2 size={24} />
+            <strong>{project.name}</strong>
+            <span>{project.date}</span>
+            <button
+              className="delete-button"
+              onClick={() => deleteProject(project.id)}
+              title="حذف المشروع"
+            >
+              <Trash2 size={17} />
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+)}
+          {page === "settings" && (
+  <section className="tool-page">
+    <div className="tool-heading">
+      <div className="large-tool-icon purple">
+        <Settings size={30} />
+      </div>
+      <span className="eyebrow">PERSONAL PREFERENCES</span>
+      <h1>الإعدادات</h1>
+      <p>تحكم في تفضيلات حسابك وتجربة الاستخدام.</p>
+    </div>
+
+    <div className="tool-panel settings-panel">
+      <div className="setting-row">
+        <div>
+          <strong>المظهر</strong>
+          <p>التبديل بين الوضع الداكن والفاتح.</p>
+        </div>
+        <button
+          className="secondary-button"
+          onClick={() => setDarkMode((old) => !old)}
+        >
+          {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+          {darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
+        </button>
+      </div>
+
+      <div className="setting-row">
+        <div>
+          <strong>الحساب الحالي</strong>
+          <p>{email || user}</p>
+        </div>
+        <button className="secondary-button" onClick={logout}>
+          <LogOut size={17} /> تسجيل الخروج
+        </button>
+      </div>
+    </div>
+  </section>
+)}
+</div>
+
+<footer className="app-footer">
+  <div className="footer-brand">
+    <Code2 size={17} />
+    <strong>VERSION BUILD</strong>
+  </div>
+  <span>© 2026 VERSION BUILD</span>
+  <span>CODE. CREATE. EVOLVE.</span>
+</footer>
+</main>
+
+{chatOpen && (
+  <div className="support-window">
+    <div className="support-header">
+      <div>
+        <MessageCircle size={19} />
+        <strong>الدعم الفني</strong>
+      </div>
+      <button onClick={() => setChatOpen(false)}>
+        <X size={19} />
+      </button>
+    </div>
+
+    <div className="support-messages">
+      {messages.length === 0 && (
+        <div className="support-welcome">
+          <MessageCircle size={28} />
+          <strong>أهلاً بك في الدعم الفني</strong>
+          <p>اكتب رسالتك وسنساعدك.</p>
+        </div>
+      )}
+
+      {messages.map((item) => (
+        <div className="chat-message user-message" key={item.id}>
+          {item.text}
+        </div>
+      ))}
+    </div>
+
+    <form className="support-form" onSubmit={handleSendMessage}>
+      <input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="اكتب رسالتك..."
+      />
+      <button type="submit">
+        <Send size={18} />
+      </button>
+    </form>
+  </div>
+)}
+
+<button
+  className="support-float"
+  onClick={() => setChatOpen((old) => !old)}
+  title="الدعم الفني"
+>
+  <MessageCircle size={22} />
+</button>
+</div>
+);
 }
 
-createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+createRoot(document.getElementById("root")).render(<App />);
+                
+                  
